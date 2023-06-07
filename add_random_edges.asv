@@ -1,0 +1,6 @@
+function new_A = add_random_edges(A)
+    [numRows,numCols] = size(A);
+    r_row = randi([1,numRows],1,1);
+    r_col = randi([1,numCols],1,1);
+    
+end

@@ -1,0 +1,72 @@
+clc; clear all; close all;
+
+%% path graph
+path_g = grasp_non_directed_path(6);
+path_g.A = full(path_g.A);  
+
+path_g.show_graph_options.layout_boundaries = 0.1;
+%grasp_show_graph(gca, g, 'node_text', 'ID');
+
+%node values
+[V,D] = eig(path_g.A);
+[numRows,numCols] = size(V);
+p = numSubplots(numCols);
+
+figure(1)
+for i = 1:numCols
+    subplot(p(1),p(2),i)
+    grasp_show_graph(gca, path_g, ...
+                     'node_values', V(:,i), ...
+                     'show_colorbar', 1, ...
+                     'value_scale', [-1, 1]);
+    title(['λ = ', num2str(D(i,i))])
+end
+
+%% grid graph
+grid_g = grasp_non_directed_grid(6);
+grid_g.A = full(grid_g.A);
+
+grid_g.show_graph_options.layout_boundaries = 0.1;
+
+%node values
+[V,D] = eig(grid_g.A);
+[numRows,numCols] = size(V);
+%p = numSubplots(numCols)
+num_plots = round(sqrt(numCols));
+space = ceil(numCols/num_plots);
+p = numSubplots(num_plots);
+
+figure(2)
+for i = 1:space:numCols
+    j = (i-1)/space + 1;
+    subplot(p(1),p(2),j)
+    grasp_show_graph(gca, grid_g, ...
+                     'node_values', V(:,i), ...
+                     'show_colorbar', 1, ...
+                     'value_scale', [-1, 1]);
+    title(['λ = ', num2str(D(i,i))])
+end
+
+%% triangular honeycomb graph
+honeycomb_g = triangular_honeycomb(2);
+
+honeycomb_g.show_graph_options.layout_boundaries = 0.1;
+
+%node values
+[V,D] = eig(honeycomb_g.A);
+[numRows,numCols] = size(V);
+%p = numSubplots(numCols)
+num_plots = round(sqrt(numCols));
+space = ceil(numCols/num_plots);
+p = numSubplots(num_plots);
+
+figure(3)
+for i = 1:space:numCols
+    j = (i-1)/space + 1;
+    subplot(p(1),p(2),j)
+    grasp_show_graph(gca, honeycomb_g, ...
+                     'node_values', V(:,i), ...
+                     'show_colorbar', 1, ...
+                     'value_scale', [-1, 1]);
+    title(['λ = ', num2str(D(i,i))])
+end
