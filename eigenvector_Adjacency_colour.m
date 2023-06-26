@@ -56,7 +56,7 @@ honeycomb_g.show_graph_options.layout_boundaries = 0.1;
 [V,D] = eig(honeycomb_g.A);
 [numRows,numCols] = size(V);
 %p = numSubplots(numCols)
-num_plots = round(sqrt(numCols));
+num_plots = numCols;%round(sqrt(numCols));
 space = ceil(numCols/num_plots);
 p = numSubplots(num_plots);
 
