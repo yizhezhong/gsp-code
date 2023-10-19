@@ -1,0 +1,9 @@
+function [H_0, H_1] = algorithm_2(Y, v, e_real, e_imag, v_hist, alpha)
+    Y_real = real(Y);
+    Y_imag = -imag(Y);
+    v_real = real(v);
+    v_imag = imag(v);
+
+    algorithm_1(Y_real, v_real, e_real, real(v_hist), alpha)
+
+end

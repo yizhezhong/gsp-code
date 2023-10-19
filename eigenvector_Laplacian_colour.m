@@ -1,7 +1,7 @@
 clc; clear all; close all;
 
-%% path graph
-path_g = grasp_non_directed_path(6);
+% path graph
+path_g = grasp_non_directed_path(5);
 path_g.A = full(path_g.A);
 
 path_g.show_graph_options.layout_boundaries = 0.1;
@@ -49,7 +49,7 @@ for i = 1:numCols
     title(['λ = ', num2str(eig_val(i,i))])
 end
 %% grid graph
-grid_g = grasp_non_directed_grid(6);
+grid_g = grasp_non_directed_grid(10);
 grid_g.A = full(grid_g.A);
 
 grid_g.show_graph_options.layout_boundaries = 0.1;

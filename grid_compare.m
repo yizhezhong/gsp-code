@@ -1,28 +1,17 @@
 clc; clear all; close all;
 
-% geometric graph
-num_nodes = 100;
-window_length = 10;
-exp_neighbours = 4;
-found = 0;
-while found == 0
-    radius = sqrt(exp_neighbours/(num_nodes-1)*(window_length*2)^2/pi)
+%% grid graph
+grid_g = grasp_non_directed_grid(5);
+grid_g.A = full(grid_g.A);
 
-    geo_g = geometric(num_nodes, window_length, radius);
-    avg_deg = sum(geo_g.A, "all")/num_nodes
-    if avg_deg > 3.95 && avg_deg < 4.05
-        found = 1;
-    end
-end
-
-geo_g.show_graph_options.layout_boundaries = 0.1;
+grid_g.show_graph_options.layout_boundaries = 0.1;
 
 %Laplacian
-one = ones(size(geo_g.A, 1),1);
-D = diag(geo_g.A * one);
-L = D - geo_g.A;
+one = ones(size(grid_g.A, 1),1);
+D = diag(grid_g.A * one);
+L = D - grid_g.A;
 [eig_vec, eig_val] = eig(L);
-%plot setting
+
 [numRows,numCols] = size(eig_vec);
 num_plots = 6; %round(sqrt(numCols)/2)
 %space = ceil(numCols/num_plots);
@@ -37,7 +26,7 @@ for n = 1:fig_num
         %j = (i-1)/space + 1;
         subplot(p(1),p(2),j)
         %subplot(p(1),p(2),i)
-        grasp_show_graph(gca, geo_g, ...
+        grasp_show_graph(gca, grid_g, ...
                          'node_values', eig_vec(:,i), ...
                          'show_colorbar', 1, ...
                          'value_scale', [-1, 1]);

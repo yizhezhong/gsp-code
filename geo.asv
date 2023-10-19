@@ -4,17 +4,16 @@ clc; clear all; close all;
 num_nodes = 100;
 window_length = 10;
 exp_neighbours = 4;
-found = 0;
-while found == 0
+t = 0
+for i = 1:1000
     radius = sqrt(exp_neighbours/(num_nodes-1)*(window_length*2)^2/pi)
 
     geo_g = geometric(num_nodes, window_length, radius);
     avg_deg = sum(geo_g.A, "all")/num_nodes
-    if avg_deg > 3.95 && avg_deg < 4.05
-        found = 1;
-    end
+    t = t + avg_deg;
 end
-
+v = t/1000
+%%
 geo_g.show_graph_options.layout_boundaries = 0.1;
 
 %Laplacian

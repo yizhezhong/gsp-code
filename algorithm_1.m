@@ -1,0 +1,49 @@
+function [phi, tor] = algorithm_1(L, s, e, historic_s, alpha)
+    [U, Lambda] = eig(L); %step 1
+    F = transpose(U)*s; %step 2
+    [numRows,numCols] = size(L); %step 3
+    M = numCols;
+    Limit = M - 1;
+    matrix_M = zeros(Limit);
+    for i = 1:M
+        for j = 0:Limit
+            matrix_M(i,j+1) = eig_val(i,i)^j;
+        end
+    end
+    
+    for r = M:-1:1 %step 4
+        sum = 0;
+        for m = r:M
+            sum = sum + (abs(F*eig_val(m,m)))^2
+        end
+        if e < sum
+            cutoff = eig_val(r,r);
+            break
+        end
+    end
+    
+    ones = zeros(M, 1); %step 5
+    for i = 1:M
+        if eig_val(i,i) > cutoff
+            ones(i,1) = 1;
+        end
+    end
+    h = ones*inv(matrix_M);
+
+    h_lambda = 0; %step 6
+    for i = 1:Limit+1
+        h_lambda = h(i,1)*(Lambda)^(i-1);
+    end
+    F_filter = h_lambda*F;
+
+    %for i = 1:M
+        %norm_phi = F_filter
+    phi = norm(F_filter); %step 7
+    
+    for k = 1:M %step 8
+        phi_hist(k) = norm(h_lambda*F_filter(k));
+    end
+    u_phi = mean(phi_hist);
+    sigma_phi = std(phi_hist);
+    tor = u_phi + sigma_phi*alpha;
+end
