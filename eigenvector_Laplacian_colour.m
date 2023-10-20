@@ -4,6 +4,7 @@ clc; clear all; close all;
 path_g = grasp_non_directed_path(5);
 path_g.A = full(path_g.A);
 
+
 path_g.show_graph_options.layout_boundaries = 0.1;
 %grasp_show_graph(gca, g, 'node_text', 'ID');
 
