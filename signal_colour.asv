@@ -11,7 +11,7 @@ honeycomb_g = triangular_honeycomb(graph_size);
 %honeycomb_g.A(4,10) = 1;
 %honeycomb_g.A(10,4) = 1;
 
-break_amount = 5;
+break_amount = 10;
 honeycomb_g = break_symmetry(honeycomb_g, graph_size, break_amount);
 
 honeycomb_g.show_graph_options.layout_boundaries = 0.1;
@@ -111,17 +111,17 @@ f = 1;
 
 signals_2 = signals;
 %set attack here
-attack_val = 0.5;
+attack_val = 0;
 attack_node = 4;
 signals_2(attack_node) = attack_val;
 
 % Make the spread of the Gaussians be 20% of the a values
-sigmas = 0 * signals; % Also a column vector. %0.05
+sigmas = 0.03 * signals; % Also a column vector. %0.05
 % Create the noise values that we'll add to a.
 randomNoise = randn(length(signals), 1) .* sigmas;
 % Add noise to a to make an output column vector.
 signals_wth_noise = signals + randomNoise;
-attack_val = 0.5;
+attack_val = 0;
 attack_node = 4;
 signals_wth_noise(attack_node) = signals_wth_noise(attack_node) + attack_val;
 
@@ -192,9 +192,9 @@ title('attacked (actual scale)')
 
 % Plot that spans
 nexttile([2 3])
-plot(diag(eig_val), Y, '-o')
+plot(diag(eig_val), Fs, '-o')
 hold on
-plot(diag(eig_val), Y_2, '-x')
+plot(diag(eig_val), Fs_2, '-x')
 
 phi
 tor

@@ -16,6 +16,6 @@ function new_G = break_symmetry(G, graph_size, break_amount)
     end
   
     [numRows,numCols] = size(new_G.A);
-    new_G.A(numRows, total_nodes-1) = 1;
-    new_G = grasp_symetrise_unweighted(new_G);
+    new_G.A(numRows+i,numCols+i-1) = 1;
+
 end
