@@ -1,6 +1,6 @@
 clc; clear all; close all;
 
-% path graph
+%% path graph
 path_g = grasp_non_directed_path(5);
 path_g.A = full(path_g.A);
 

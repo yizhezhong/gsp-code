@@ -11,7 +11,7 @@ honeycomb_g = triangular_honeycomb(graph_size);
 %honeycomb_g.A(4,10) = 1;
 %honeycomb_g.A(10,4) = 1;
 
-break_amount = 5;
+break_amount = 3;
 honeycomb_g = break_symmetry(honeycomb_g, graph_size, break_amount);
 
 honeycomb_g.show_graph_options.layout_boundaries = 0.1;
@@ -34,13 +34,13 @@ row2_indexes = rows2indexes(1, sqrt(3), honeycomb_g);
 signals = zeros(size(honeycomb_g.layout, 1), 1);
 
 %set signals here (mode 1: rows; mode 2: layers)
-mode = 2;
+mode = 1;
 if mode == 1
     signals(:,:) = 0.01;
     %signals = random_signals(signals, signal_lower_limits, signal_upper_limits, all_indexes, honeycomb_g);
     signals = set_signals(signals, 1, row1_indexes, honeycomb_g);
     signals = set_signals(signals, 0.5, row2_indexes, honeycomb_g);
-    signals = set_signals(signals,0,20,honeycomb_g);
+    %signals = set_signals(signals,0,20,honeycomb_g);
     %signals = random_signals(signals, -1, 1, all_indexes, honeycomb_g);
 elseif mode == 2
     first_node = 1;
@@ -54,7 +54,8 @@ end
 break_indexes = total_nodes+1:total_nodes+break_amount;
 signals = set_signals(signals, 1, break_indexes, honeycomb_g);
 
-signals
+size(eig_vec)
+size(signals)
 coef = signals' * eig_vec;
 %signals_gft = eig_vec * coef';
 signals_gft = transpose(eig_vec) * signals;
