@@ -11,8 +11,10 @@ honeycomb_g = triangular_honeycomb(graph_size);
 %honeycomb_g.A(4,10) = 1;
 %honeycomb_g.A(10,4) = 1;
 
-break_amount = 3;
+break_amount = 2; remove_amount = 0;
+honeycomb_g = remove_edges(honeycomb_g, graph_size, remove_amount);
 honeycomb_g = break_symmetry(honeycomb_g, graph_size, break_amount);
+%honeycomb_g = add_isol(honeycomb_g, graph_size, break_amount);
 
 honeycomb_g.show_graph_options.layout_boundaries = 0.1;
 
