@@ -18,7 +18,7 @@ function H = GHPF(L, threshold)
 
     h = linsolve(M,B);
     %h = M\B;
-    %t = M*h;
+    t = M*h
     
     H = zeros(size(eig_val_matrix));
     for i = 1:size(h, 1)
