@@ -1,73 +1,84 @@
 function [phi, tor, return_cutoff, cutoff] = alg_1_ghpf(L, signals, e, historic_s, alpha)
+    filter_mode = 1; %ideal = 1
     [U, Lambda] = eig(L); %step 1
     F = transpose(U)*signals; %step 2
     [numRows,numCols] = size(L); %step 3
     M = numCols;
     [eig_vec, eig_val] = eig(L);
-    % for r = M:-1:1 %step 4
-    %     sum = 0;
-    %     for m = r:M
-    %         sum = sum + (dot(F, eig_vec(:,m)))^2;
-    %     end
-    % 
-    %     if e < sum
-    %         cutoff = r;
-    %         break
-    %     end
-    % end
-    % 
-    % H = GHPF(L, cutoff);
 
-    % Fs = H*F;
-    % phi = max(abs(Fs));
+    manually_set = 1;
 
-    phi_hist = zeros(size(historic_s, 2));
-    for k = 1:size(historic_s, 2) %step 8
-        [U, Lambda] = eig(L); %step 1
-        F = transpose(U)*historic_s(:,k); %step 2
-        [numRows,numCols] = size(L); %step 3
-        M = numCols;
-        [eig_vec, eig_val] = eig(L);
-        for r = M:-1:1 %step 4
-            sum = 0;
-            for m = r:M
-                sum = sum + (dot(F, eig_vec(:,m)))^2;
+    if manually_set == 0
+        % for r = M:-1:1 %step 4
+        %     sum = 0;
+        %     for m = r:M
+        %         sum = sum + (dot(F, eig_vec(:,m)))^2;
+        %     end
+        % 
+        %     if e < sum
+        %         cutoff = r;
+        %         break
+        %     end
+        % end
+        % 
+        % H = GHPF(L, cutoff, filter_mode); %ideal = 1
+    
+        % Fs = H*F;
+        % phi = max(abs(Fs));
+    
+        phi_hist = zeros(size(historic_s, 2));
+        for k = 1:size(historic_s, 2) %step 8
+            [U, Lambda] = eig(L); %step 1
+            F = transpose(U)*historic_s(:,k); %step 2
+            [numRows,numCols] = size(L); %step 3
+            M = numCols;
+            [eig_vec, eig_val] = eig(L);
+            for r = M:-1:1 %step 4
+                sum = 0;
+                for m = r:M
+                    sum = sum + (dot(F, eig_vec(:,m)))^2;
+                end
+                %sum
+                if e < sum
+                    cutoff = r;
+                    return_cutoff = eig_val(r,r);
+                    break
+                end
             end
-            %sum
-            if e < sum
-                cutoff = r;
-                return_cutoff = eig_val(r,r);
-                break
+            %cutoff
+            %diag(Lambda)
+    
+            % ---- this is for sum vs. index comparison ----
+            for r = M:-1:1 %step 4
+                sum2 = 0;
+                for m = r:M
+                    sum2 = sum2 + (dot(F, eig_vec(:,m)))^2;
+                end
+                error_sum(r) = sum2;
+                %sum
+                r
+                sum2
             end
+            
+            figure(10)
+            plot(error_sum, '-o')
+            % ---- this is the end ----
+        elseif manully_set == 1
+            %set cutoff manually
+            cutoff = round(M * 0.6)
+            return_cutoff = eig_val(cutoff,cutoff);
         end
-        %cutoff
-        %diag(Lambda)
 
-        % ---- this is for sum vs. index comparison ----
-        for r = M:-1:1 %step 4
-            sum2 = 0;
-            for m = r:M
-                error_sum()
-                sum2 = sum2 + (dot(F, eig_vec(:,m)))^2;
-            end
-            %sum
-            if e < sum2
-                cutoff2 = r;
-                return_cutoff2 = eig_val(r,r);
-                break
-            end
-        end
-        % ---- this is the end ----
+        H = GHPF(L, cutoff, filter_mode);
 
-        H = GHPF(L, cutoff);
         Fs = H*F;
-        %Fs
+
         phi_hist(k) = max(abs(Fs));
     end
 
     F = transpose(U)*signals; %step 2
     Fs = H*F;
-    %Fs
+
     phi = max(abs(Fs));
 
     u_phi = mean(phi_hist);

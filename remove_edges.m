@@ -5,7 +5,7 @@ function new_G = remove_edges(G, graph_size, remove_amount)
     new_G = G;
 
     for i = 1:remove_amount
-        removed = 0
+        removed = 0;
         while removed == 0
             r = randi([1 total_nodes],1,1);
             dir = randi([1 4],1,1);
