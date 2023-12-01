@@ -15,7 +15,8 @@ for test_round = 1:1
     format shortG
 
     %-------------------------------------------settings-----------------------------------------
-    settings_mode = 9;
+    settings_mode = 8;
+    add_center = 0;
     if settings_mode == 1
         filter_mode = 1; %ideal = 1
         signal_mode = 1; %set signals here (mode 1: rows; mode 2: layers)
@@ -292,6 +293,7 @@ for test_round = 1:1
     figure(6)
     plot(diag(eig_val), '-o')
     
+    %eig_val = eig_val;
     eig_val = eig_val./max(eig_val,[],"all");
     
     figure(7)
@@ -339,6 +341,8 @@ for test_round = 1:1
     ylabel('frequency response')
     yline(0,'--')
     [eig_vec, eig_val] = eig(L);
+    
+    %cutoff = return_cutoff;
     cutoff = return_cutoff/max(eig_val,[],"all");
     xline(cutoff,'--')
     legend('origional','attacked')
