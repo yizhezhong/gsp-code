@@ -1,0 +1,21 @@
+function new_G = add_custom_center(G)
+    [numRows,numCols] = size(G.A);
+    total_nodes = 1+graph_size*(graph_size+1)/2*6;
+    
+    new_G = G;
+
+    for i = 1:1
+        new_G.A(numRows+i,numCols+i) = 0;
+        new_G.A(numRows+i,:) = 1;
+        %[numRows2,numCols2] = size(new_G.A)
+        new_G = grasp_symetrise_unweighted(new_G);
+    
+        %[numRows,numCols] = size(new_G.layout);
+        new_G.layout(numRows+i, 1) = new_G.layout(numRows+i-1,1);
+        new_G.layout(numRows+i, 2) = new_G.layout(numRows+i-1,2) + sqrt(3);
+    end
+  
+    [numRows,numCols] = size(new_G.A);
+    new_G.A(numRows, total_nodes-1) = 1;
+    new_G = grasp_symetrise_unweighted(new_G);
+end
