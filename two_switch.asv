@@ -1,0 +1,54 @@
+function new_G = two_switch(G, num)
+    [numRows,numCols] = size(G.A);
+    new_G = G;
+    temp_G = G;
+    changed = 0;
+    changed_pairs = [0 0];
+    while changed < num
+        node_1 = randi([1 numCols],1,1);
+        nodes_1 = find_connection(temp_G, node_1);
+        node_2 = nodes_1(randi([1 size(nodes_1,2)],1,1));
+        if ismember([node_1 node_2],changed_pairs,'rows') == 0 &&  ismember([node_2 node_1],changed_pairs,'rows') == 0
+            node_3 = node_1;
+            node_4 = node_1;
+            check_node_4 = 0;
+            while node_3 == node_1 || node_3 == node_2 || new_G.A(node_1,node_3) == 1 || new_G.A(node_2,node_3) == 1 || check_node_4 == 0 || ismember([node_3 node_4],changed_pairs,'rows') == 1 || ismember([node_4 node_3],changed_pairs,'rows') == 1
+                temp_G = G;
+                node_3 = randi([1 numCols],1,1);
+                temp_G.A(node_3, node_1) = 0;
+                temp_G.A(node_3, node_2) = 0;
+                temp_G = grasp_symetrise_unweighted(temp_G);
+                nodes_3 = find_connection(temp_G, node_3);
+                if isempty(nodes_3) == 0
+                    node_4 = nodes_3(randi([1 size(nodes_3,2)],1,1));
+                end
+                if new_G.A(node_4, node_2) == 0 && new_G.A(node_4, node_1) == 0
+                    check_node_4 = 1;
+                end
+            end
+            [node_1 node_2 node_3 node_4]
+            new_G.A(node_1, node_2) = 0;
+            new_G.A(node_2, node_1) = 0;
+            new_G.A(node_3, node_4) = 0;
+            new_G.A(node_4, node_3) = 0;
+            new_G.A(node_1, node_3) = 1;
+            new_G.A(node_2, node_4) = 1;
+%             new_G.layout(node_1, 1) = new_G.layout(node_1, 1) - 0.5;
+%             new_G.layout(node_2, 1) = new_G.layout(node_2, 1) - 0.5;
+%             new_G.layout(node_3, 1) = new_G.layout(node_3, 1) - 0.5;
+%             new_G.layout(node_4, 1) = new_G.layout(node_4, 1) - 0.5;
+            new_G = grasp_symetrise_unweighted(new_G);
+            new_G.A(node_1, node_2)
+            new_G.A(node_2, node_1)
+            new_G.A(node_3, node_4)
+            new_G.A(node_4, node_3)
+            new_G.A(node_1, node_3)
+            new_G.A(node_2, node_4)
+            new_G.A(node_1, node_3)
+            new_G.A(node_2, node_4)
+
+            changed = changed +1;
+            changed_pairs = [changed_pairs; node_1 node_2; node_3 node_4];
+        end
+    end
+end

@@ -5,7 +5,7 @@ forced_stop = 0;
 detected_num_comparision = 0
 failed_num_comparision = 0
 
-for test_round = 1:1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+for test_round = 1:100                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
     stop_sign = 0; %set to 1 to stop when failed
     if forced_stop == 1
         break
@@ -17,10 +17,12 @@ for test_round = 1:1
     format shortG
 
     %-------------------------------------------settings-----------------------------------------
-    settings_mode = 11;
+    settings_mode = 17;
     add_center = 0;
     custom_center = 0;
     shortcut_distance = 0;
+    two_switch_num = 0;
+    show_comparision = 0;
     if settings_mode == 1
         filter_mode = 1; %ideal = 1
         signal_mode = 1; %set signals here (mode 1: rows; mode 2: layers)
@@ -147,8 +149,8 @@ for test_round = 1:1
         graph_size = 2;
         break_amount = 2; 
         remove_amount = 3;
-        attack_val = 0;
-        attack_node = 4;
+        attack_val = 0.1;
+        attack_node = 0;
         attack_method = 2; % 1 = override; 2 = addition
         noise_on = 0; % 0 = without noise; 1 = with noise
         noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
@@ -202,25 +204,104 @@ for test_round = 1:1
         center_node = 1:21;
         shortcut_distance = 3;
         show_comparision = 1;
+    elseif settings_mode == 15
+        filter_mode = 1; %ideal = 1
+        signal_mode = 1; %set signals here (mode 1: rows; mode 2: layers)
+        graph_size = 2;
+        break_amount = 2; 
+        remove_amount = 3;
+        attack_val = 0.1;
+        attack_node = 8;
+        attack_method = 2; % 1 = override; 2 = addition
+        noise_on = 0; % 0 = without noise; 1 = with noise
+        noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
+        add_center = 0;
+        center_node = 1:21;
+        shortcut_distance = 0;
+        show_comparision = 0;
+        custom_center = 1;
+    elseif settings_mode == 16
+        filter_mode = 1; %ideal = 1
+        signal_mode = 1; %set signals here (mode 1: rows; mode 2: layers)
+        graph_size = 2;
+        break_amount = 2; 
+        remove_amount = 10;
+        attack_val = 0.1;
+        attack_node = 4;
+        attack_method = 2; % 1 = override; 2 = addition
+        noise_on = 0; % 0 = without noise; 1 = with noise
+        noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
+        add_center = 0;
+        center_node = 1:21;
+        shortcut_distance = 0;
+        show_comparision = 1;
+        custom_center = 0;
+        two_switch_num = 1;
+    elseif settings_mode == 17
+        filter_mode = 1; %ideal = 1
+        signal_mode = 1; %set signals here (mode 1: rows; mode 2: layers)
+        graph_size = 2;
+        break_amount = 2; 
+        remove_amount = 3;
+        attack_val = 0.1;
+        attack_node = 4;
+        attack_method = 2; % 1 = override; 2 = addition
+        noise_on = 0; % 0 = without noise; 1 = with noise
+        noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
+        add_center = 0;
+        center_node = 1:21;
+        shortcut_distance = 0;
+        show_comparision = 1;
+        custom_center = 0;
+        two_switch_num = 1;
+    elseif settings_mode == 18
+        filter_mode = 1; %ideal = 1
+        signal_mode = 2; %set signals here (mode 1: rows; mode 2: layers)
+        graph_size = 2;
+        break_amount = 2; 
+        remove_amount = 3;
+        attack_val = 0.1;
+        attack_node = 4;
+        attack_method = 2; % 1 = override; 2 = addition
+        noise_on = 0; % 0 = without noise; 1 = with noise
+        noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
+        add_center = 0;
+        center_node = 1:21;
+        shortcut_distance = 0;
+        show_comparision = 1;
+        custom_center = 0;
+        two_switch_num = 1;
     end
     %--------------------------------------------------------------------------------------------
 
     total_nodes = 1+graph_size*(graph_size+1)/2*6;
     honeycomb_g = triangular_honeycomb(graph_size);
+    debug = 0;
+    if debug == 1
+        hhh = 2;
+        honeycomb_g.layout(hhh,1) = -10;
+        honeycomb_g.layout(hhh,2) = -10;
+    end
     %honeycomb_g = grasp_non_directed_grid(2);
     %honeycomb_g.A = full(honeycomb_g.A);
     %honeycomb_g.A(4,10) = 1;
     %honeycomb_g.A(10,4) = 1;
-    
-    honeycomb_g = remove_edges(honeycomb_g, graph_size, remove_amount);
-    honeycomb_g = break_symmetry(honeycomb_g, graph_size, break_amount);
-    %honeycomb_g = add_isol(honeycomb_g, graph_size, break_amount);
 
-    if add_center == 0
-    else
-        for i = 1:add_center
-            honeycomb_g = create_center(honeycomb_g, center_node(i));
+    temp_G = honeycomb_g;
+    connected = 0;
+    while connected == 0
+        honeycomb_g = temp_G;
+        honeycomb_g = remove_edges(honeycomb_g, graph_size, remove_amount);
+        honeycomb_g = break_symmetry(honeycomb_g, graph_size, break_amount);
+        %honeycomb_g = add_isol(honeycomb_g, graph_size, break_amount);
+    
+        if add_center == 0
+        else
+            for i = 1:add_center
+                honeycomb_g = create_center(honeycomb_g, center_node(i));
+            end
         end
+        connected = check_connectivity(honeycomb_g);
     end
 
    % if shortcut_distance > 0
@@ -265,8 +346,11 @@ for test_round = 1:1
         avg_signal = signal_sum/(size(honeycomb_g.A, 1));
         honeycomb_g = add_custom_center(honeycomb_g);
         signals(size(honeycomb_g.A, 1)) = 0;
-        attack_node = (size(honeycomb_g.A, 1));
-        attack_val = avg_signal;
+        custom_center_node = (size(honeycomb_g.A, 1));
+        if attack_node == 0
+            attack_node = custom_center_node;
+        end
+        signals(custom_center_node) = avg_signal;
     end
 %----
     one = ones(size(honeycomb_g.A, 1),1);
@@ -479,6 +563,8 @@ for test_round = 1:1
         if shortcut_distance > 0
             honeycomb_g = add_shortcut(honeycomb_g, shortcut_distance);
         end
+
+        honeycomb_g = two_switch(honeycomb_g, two_switch_num);
         
         honeycomb_g.show_graph_options.layout_boundaries = 0.1;
         
