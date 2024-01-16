@@ -2,22 +2,26 @@ clc; clear all; close all;
 detected_num = 0;
 failed_num = 0;
 forced_stop = 0;
-detected_num_comparision = 0
-failed_num_comparision = 0
+detected_num_comparision = 0;
+failed_num_comparision = 0;
+%-----
+center_edge_probability = 1;
+%-----
 
-for test_round = 1:100                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+for test_round = 1:90                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
     stop_sign = 0; %set to 1 to stop when failed
     if forced_stop == 1
         break
     end
     test_round
-    clearvars -except detected_num failed_num forced_stop stop_sign detected_num_comparision failed_num_comparision; close all;
+    clearvars -except test_round detected_num failed_num forced_stop stop_sign detected_num_comparision failed_num_comparision center_edge_probability; close all;
     %format short
     %format rat
     format shortG
 
     %-------------------------------------------settings-----------------------------------------
-    settings_mode = 17;
+    settings_mode = 20;
+    hold_inc = 0;
     add_center = 0;
     custom_center = 0;
     shortcut_distance = 0;
@@ -211,7 +215,7 @@ for test_round = 1:100
         break_amount = 2; 
         remove_amount = 3;
         attack_val = 0.1;
-        attack_node = 8;
+        attack_node = 17;
         attack_method = 2; % 1 = override; 2 = addition
         noise_on = 0; % 0 = without noise; 1 = with noise
         noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
@@ -271,6 +275,47 @@ for test_round = 1:100
         show_comparision = 1;
         custom_center = 0;
         two_switch_num = 1;
+    elseif settings_mode == 19
+        filter_mode = 1; %ideal = 1
+        signal_mode = 2; %set signals here (mode 1: rows; mode 2: layers)
+        graph_size = 2;
+        break_amount = 2; 
+        remove_amount = 0;
+        attack_val = 0.1;
+        attack_node = 4;
+        attack_method = 2; % 1 = override; 2 = addition
+        noise_on = 0; % 0 = without noise; 1 = with noise
+        noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
+        add_center = 0;
+        center_node = 1:21;
+        shortcut_distance = 0;
+        show_comparision = 1;
+        custom_center = 0;
+        two_switch_num = 1;
+    elseif settings_mode == 20
+        filter_mode = 1; %ideal = 1
+        signal_mode = 1; %set signals here (mode 1: rows; mode 2: layers)
+        graph_size = 2;
+        break_amount = 2; 
+        remove_amount = 3;
+        attack_val = 0.1;
+        attack_node = 17;
+        attack_method = 2; % 1 = override; 2 = addition
+        noise_on = 0; % 0 = without noise; 1 = with noise
+        noise_coefficient = 0; %e.g. 0.05, only matters when noise_on is 1
+        add_center = 0;
+        center_node = 1:21;
+        shortcut_distance = 0;
+        show_comparision = 1;
+        center_compare = 1;
+        custom_center = 1;
+        if test_round == 1 || mod(test_round-1, 10) == 0
+            center_edge_probability = center_edge_probability - 0.1
+            detected_num = 0;
+            failed_num = 0;
+            detected_num_comparision = 0;
+            failed_num_comparision = 0;
+        end
     end
     %--------------------------------------------------------------------------------------------
 
@@ -351,6 +396,32 @@ for test_round = 1:100
             attack_node = custom_center_node;
         end
         signals(custom_center_node) = avg_signal;
+        nodes_to_center = find_connection(honeycomb_g, custom_center_node);
+        if center_edge_probability < 1
+            for i = 1:size(nodes_to_center, 2)
+                exst = randi([1 100],1,1);
+                if exst > center_edge_probability*100
+                    honeycomb_g.A(custom_center_node, nodes_to_center(i)) = 0;
+                    honeycomb_g.A(nodes_to_center(i), custom_center_node) = 0;
+                end
+            end
+        end
+        nodes_to_center_new = find_connection(honeycomb_g, custom_center_node); 
+        
+        center_node_connections = find_connection(honeycomb_g, custom_center_node);
+        all_nodes = 1:(size(honeycomb_g.A, 1)-1);
+        non_adj_nodes = setdiff(all_nodes, center_node_connections);
+
+        if isempty(nodes_to_center_new)
+            fprintf('no nodes to center\n')
+            hold_inc = 1;
+        elseif isempty(non_adj_nodes)
+            hold_inc = 1;
+        elseif check_connectivity(honeycomb_g) == 0
+            hold_inc = 1;     
+        else
+            attack_node = nodes_to_center_new(randi([1, size(nodes_to_center_new, 2)], 1, 1));
+        end
     end
 %----
     one = ones(size(honeycomb_g.A, 1),1);
@@ -361,6 +432,9 @@ for test_round = 1:100
     coef = signals' * eig_vec;
     %signals_gft = eig_vec * coef';
     signals_gft = transpose(eig_vec) * signals;
+
+    %smoothness_original = smoothness(honeycomb_g.A, signals)
+
     
     figure(1)
     subplot(1, 2, 1)
@@ -506,11 +580,17 @@ for test_round = 1:100
         txt = 'Attack Detected';
         %display('attack')
         title(txt, 'Color', 'r')
-        detected_num = detected_num + 1;
+        if hold_inc == 1
+        else
+            detected_num = detected_num + 1;
+        end
     else
         txt = 'Attack Not Detected';
         title(txt, 'Color', 'b')
-        failed_num = failed_num + 1;
+        if hold_inc == 1
+        else
+            failed_num = failed_num + 1;
+        end
         forced_stop = stop_sign;
     end
     xlabel('normalized frequency')
@@ -564,7 +644,18 @@ for test_round = 1:100
             honeycomb_g = add_shortcut(honeycomb_g, shortcut_distance);
         end
 
-        honeycomb_g = two_switch(honeycomb_g, two_switch_num);
+        if center_compare == 1
+            center_node_connections = find_connection(honeycomb_g, custom_center_node);
+            all_nodes = 1:(size(honeycomb_g.A, 1)-1);
+            non_adj_nodes = setdiff(all_nodes, center_node_connections);
+            if isempty(non_adj_nodes)
+                fprintf('no non-adj nodes\n')
+            else
+                attack_node = non_adj_nodes(randi([1, size(non_adj_nodes, 2)], 1, 1));
+            end
+        else
+            honeycomb_g = two_switch(honeycomb_g, two_switch_num);
+        end
         
         honeycomb_g.show_graph_options.layout_boundaries = 0.1;
         
@@ -603,10 +694,27 @@ for test_round = 1:100
         end
         break_indexes = total_nodes+1:total_nodes+break_amount;
         signals = set_signals(signals, 1, break_indexes, honeycomb_g);
+
+        if custom_center == 1
+            signal_sum = sum(signals);
+            avg_signal = signal_sum/(size(honeycomb_g.A, 1)-1);
+            signals(size(honeycomb_g.A, 1)) = 0;
+            custom_center_node = (size(honeycomb_g.A, 1));
+            if attack_node == 0
+                attack_node = custom_center_node;
+            end
+            signals(custom_center_node) = avg_signal;
+        end
         
         coef = signals' * eig_vec;
         %signals_gft = eig_vec * coef';
         signals_gft = transpose(eig_vec) * signals;
+
+        % smoothness_comparision = smoothness(honeycomb_g.A, signals)
+        % while smoothness_comparision > smoothness_original
+        %     signals = L * signals;
+        %     smoothness_comparision = smoothness(honeycomb_g.A, signals)
+        % end
         
         figure(10)
         subplot(1, 2, 1)
@@ -752,11 +860,17 @@ for test_round = 1:100
             txt = 'Attack Detected';
             %display('attack')
             title(txt, 'Color', 'r')
-            detected_num_comparision = detected_num_comparision + 1;
+            if hold_inc == 1
+            else
+                detected_num_comparision = detected_num_comparision + 1;
+            end
         else
             txt = 'Attack Not Detected';
             title(txt, 'Color', 'b')
-            failed_num_comparision = failed_num_comparision + 1;
+            if hold_inc == 1
+            else
+                failed_num_comparision = failed_num_comparision + 1;
+            end
             forced_stop = stop_sign;
         end
         xlabel('normalized frequency')
