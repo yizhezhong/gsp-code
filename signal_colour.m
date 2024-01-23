@@ -8,7 +8,7 @@ failed_num_comparision = 0;
 center_edge_probability = 1;
 %-----
 
-for test_round = 1:90                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+for test_round = 1:1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     stop_sign = 0; %set to 1 to stop when failed
     if forced_stop == 1
         break
@@ -20,7 +20,8 @@ for test_round = 1:90
     format shortG
 
     %-------------------------------------------settings-----------------------------------------
-    settings_mode = 20;
+    settings_mode = 1;
+    eig_colour = 1;
     hold_inc = 0;
     add_center = 0;
     custom_center = 0;
@@ -31,7 +32,7 @@ for test_round = 1:90
         filter_mode = 1; %ideal = 1
         signal_mode = 1; %set signals here (mode 1: rows; mode 2: layers)
         graph_size = 2;
-        break_amount = 2; 
+        break_amount = 5; 
         remove_amount = 3;
         attack_val = 0.1;
         attack_node = 4;
@@ -365,15 +366,21 @@ for test_round = 1:90
     all_indexes = 1:size(honeycomb_g.A, 1);
     row1_indexes = rows2indexes(2, sqrt(3), honeycomb_g);
     row2_indexes = rows2indexes(1, sqrt(3), honeycomb_g);
+    row0_indexes = rows2indexes(0, sqrt(3), honeycomb_g);
+    rown1_indexes = rows2indexes(-1, sqrt(3), honeycomb_g);
+    rown2_indexes = rows2indexes(-2, sqrt(3), honeycomb_g);
     signals = zeros(size(honeycomb_g.layout, 1), 1);
     
     if signal_mode == 1
-        signals(:,:) = 0.01;
         %signals = random_signals(signals, signal_lower_limits, signal_upper_limits, all_indexes, honeycomb_g);
         signals = set_signals(signals, 1, row1_indexes, honeycomb_g);
-        signals = set_signals(signals, 0.5, row2_indexes, honeycomb_g);
+        signals = set_signals(signals, 0.6, row2_indexes, honeycomb_g);
+        signals = set_signals(signals, 0.2, row0_indexes, honeycomb_g);
+        signals = set_signals(signals, 0.6, rown1_indexes, honeycomb_g);
+        signals = set_signals(signals, 1, rown2_indexes, honeycomb_g);
         %signals = set_signals(signals,0,20,honeycomb_g);
-        %signals = random_signals(signals, -1, 1, all_indexes, honeycomb_g);
+        %signals = random_signals(signals, -1, 1, all_indexes,
+        %honeycomb_g); 
     elseif signal_mode == 2
         first_node = 1;
         for layer = 0:graph_size
@@ -382,6 +389,13 @@ for test_round = 1:90
             signals = set_signals(signals, (layer+1)/(graph_size+1),layer_indexes, honeycomb_g);
             first_node = total_nodes + 1;
         end
+    elseif signal_mode == 3
+        signals(:,:) = 0.01;
+        %signals = random_signals(signals, signal_lower_limits, signal_upper_limits, all_indexes, honeycomb_g);
+        signals = set_signals(signals, 1, row1_indexes, honeycomb_g);
+        signals = set_signals(signals, 0.5, row2_indexes, honeycomb_g);
+        %signals = set_signals(signals,0,20,honeycomb_g);
+        %signals = random_signals(signals, -1, 1, all_indexes, honeycomb_g);
     end
     break_indexes = total_nodes+1:total_nodes+break_amount;
     signals = set_signals(signals, 1, break_indexes, honeycomb_g);
@@ -553,13 +567,13 @@ for test_round = 1:90
                          'node_values', signals, ...
                          'show_colorbar', 1, ...
                          'value_scale', [signal_lower_limits, signal_upper_limits]);
-    title('original')
+    title('Original Signal')
     nexttile
     grasp_show_graph(gca, honeycomb_g, ...
                          'node_values', signals_after_attack, ...
                          'show_colorbar', 1, ...
                          'value_scale', [signal_lower_limits, signal_upper_limits]);
-    title('attacked')
+    title('Attacked Signal')
     nexttile
     comp = [Fs; 0; attack_val];
     signal_lower_limits = min(comp);
@@ -568,10 +582,10 @@ for test_round = 1:90
                          'node_values', signals_after_attack, ...
                          'show_colorbar', 1, ...
                          'value_scale', [signal_lower_limits, signal_upper_limits]);
-    title('attacked (actual scale)')
+    title('Attacked Signal (dynamic range scale)')
     
     % Plot that spans
-    nexttile([2 3])
+    t = nexttile([2 3]);
     plot(diag(eig_val), Y, '-o')
     hold on
     plot(diag(eig_val), Y_2, '-x')
@@ -579,22 +593,27 @@ for test_round = 1:90
     if phi > tor
         txt = 'Attack Detected';
         %display('attack')
-        title(txt, 'Color', 'r')
+        %title(txt, 'Color', 'r')
+        dim = [.2 .5 .3 .3];     
+        %annotation('textbox',dim,'String',txt,'FitBoxToText','on');
+        annotation('textbox',dim,'String',txt,'Position',t.Position,'verticalalignment','top','horizontalalignment','center','FitBoxToText','on')
         if hold_inc == 1
         else
             detected_num = detected_num + 1;
         end
     else
         txt = 'Attack Not Detected';
-        title(txt, 'Color', 'b')
+        %title(txt, 'Color', 'b')
+        dim = [.2 .5 .3 .3];
+        annotation('textbox',dim,'String',txt,'FitBoxToText','on');
         if hold_inc == 1
         else
             failed_num = failed_num + 1;
         end
         forced_stop = stop_sign;
     end
-    xlabel('normalized frequency')
-    ylabel('frequency response')
+    xlabel('Normalized Frequency')
+    ylabel('Frequency Response')
     yline(0,'--')
     [eig_vec, eig_val] = eig(L);
     
@@ -605,8 +624,12 @@ for test_round = 1:90
     
     figure(8)
     plot(diag(eig_val), Fs, '-o')
-    hold on
-    plot(diag(eig_val), Fs_2, '-x')
+    title('Signal After Graph Fourier Transform')
+    xlabel('Frequency (eigenvalue)')
+    ylabel('Magnitude')
+    yline(0,'--')
+    %hold on
+    %plot(diag(eig_val), Fs_2, '-x')
     
     %% test filter
     [eig_vec, eig_val] = eig(L);
@@ -632,8 +655,30 @@ for test_round = 1:90
 %fprintf('detected %d, failed %d, success rate %.2f%%\n', detected_num, failed_num, success_rate)
 
 
-
-
+%------------------------eigenvector_Laplacian_colour------------
+if eig_colour == 1
+    one = ones(size(honeycomb_g.A, 1),1);
+    D = diag(honeycomb_g.A * one);
+    L = D - honeycomb_g.A;
+    [eig_vec, eig_val] = eig(L);
+    [numRows,numCols] = size(eig_vec);
+    %p = numSubplots(numCols)
+    num_plots = numCols;%round(sqrt(numCols));
+    space = ceil(numCols/num_plots);
+    p = numSubplots(num_plots);
+    
+    figure(10)
+    for i = 1:space:numCols
+        j = (i-1)/space + 1;
+        subplot(p(1),p(2),j)
+        grasp_show_graph(gca, honeycomb_g, ...
+                         'node_values', eig_vec(:,i), ...
+                         'show_colorbar', 1, ...
+                         'value_scale', [-1, 1]);
+        title(['λ = ', num2str(eig_val(i,i))])
+    end
+end
+%---------------------------------------------------------------
 
 
 
