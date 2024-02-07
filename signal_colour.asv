@@ -33,8 +33,8 @@ for test_round = 1:1
         filter_mode = 1; %ideal = 1
         signal_mode = 4; %set signals here (mode 1: rows; mode 2: layers)
         graph_size = 2;
-        break_amount = 1;
-        remove_amount = 0;
+        break_amount = 2;
+        remove_amount = 3;
         attack_val = 0.1;
         attack_node = 4;
         attack_method = 2; % 1 = override; 2 = addition
@@ -387,11 +387,11 @@ for test_round = 1:1
     rown2_indexes = rows2indexes(-2, row_spacing, honeycomb_g);
     signals = zeros(size(honeycomb_g.layout, 1), 1);
 
-    row1_indexes = rows2indexes(9, row_spacing, honeycomb_g); %grid
-    row2_indexes = rows2indexes(7, row_spacing, honeycomb_g);
-    row0_indexes = rows2indexes(5, row_spacing, honeycomb_g);
-    rown1_indexes = rows2indexes(3, row_spacing, honeycomb_g);
-    rown2_indexes = rows2indexes(1, row_spacing, honeycomb_g);
+    row1_indexes = rows2indexes(2, row_spacing, honeycomb_g);
+    row2_indexes = rows2indexes(1, row_spacing, honeycomb_g);
+    row0_indexes = rows2indexes(0, row_spacing, honeycomb_g);
+    rown1_indexes = rows2indexes(-1, row_spacing, honeycomb_g);
+    rown2_indexes = rows2indexes(-2, row_spacing, honeycomb_g);
     
     if signal_mode == 1
         %signals = random_signals(signals, signal_lower_limits, signal_upper_limits, all_indexes, honeycomb_g);
@@ -400,7 +400,6 @@ for test_round = 1:1
         signals = set_signals(signals, 0.2, row0_indexes, honeycomb_g);
         signals = set_signals(signals, 0.6, rown1_indexes, honeycomb_g);
         signals = set_signals(signals, 1, rown2_indexes, honeycomb_g);
-        break_value = 1;
         %signals = set_signals(signals,0,20,honeycomb_g);
         %signals = random_signals(signals, -1, 1, all_indexes,
         %honeycomb_g); 
@@ -431,7 +430,6 @@ for test_round = 1:1
         %honeycomb_g); 
         break_value = 0.6;
     end
-    total_nodes = 25; %grid
     break_indexes = total_nodes+1:total_nodes+break_amount;
     signals = set_signals(signals, break_value, break_indexes, honeycomb_g);
 
